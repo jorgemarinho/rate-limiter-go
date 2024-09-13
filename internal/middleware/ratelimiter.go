@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jorgemarinho/rate-limiter-go/internal/infra/config/internal/infra/config"
+	"github.com/jorgemarinho/rate-limiter-go/internal/infra/config"
 	"github.com/jorgemarinho/rate-limiter-go/internal/usecase"
 )
 
-func RateLimiter(rateUseCase *usecase.RateLimiterUseCase, envs *config.Conf) gin.HandlerFunc {
+func RateLimiter(rateUseCase *usecase.RateLimiterUseCase, envs *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := context.Background()
 		inputIP := usecase.InputRateLimiter{

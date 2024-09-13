@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis"
-	"github.com/jorgemarinho/rate-limiter-go/internal/config"
-	"github.com/jorgemarinho/rate-limiter-go/internal/infra"
+	"github.com/jorgemarinho/rate-limiter-go/internal/infra/config"
+	"github.com/jorgemarinho/rate-limiter-go/internal/infra/web"
 	"github.com/jorgemarinho/rate-limiter-go/internal/middleware"
 	"github.com/jorgemarinho/rate-limiter-go/internal/usecase"
+	"github.com/redis/go-redis/v9"
 )
 
 var (
@@ -27,7 +27,7 @@ func main() {
 		panic(err)
 	}
 
-	redisRepository := infra.NewRedisInteractor(rdb)
+	redisRepository := web.NewRedisInteractor(rdb)
 	rateLimiterUseCase := usecase.NewRateLimiterUseCase(redisRepository)
 
 	r := gin.Default()
