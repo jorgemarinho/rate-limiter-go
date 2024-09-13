@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jorgemarinho/rate-limiter-go/internal/infra/config/internal/infra/config"
 	"github.com/jorgemarinho/rate-limiter-go/internal/usecase"
 )
 
