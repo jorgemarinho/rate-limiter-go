@@ -2,6 +2,8 @@ package web
 
 import (
 	"context"
+	"errors"
+	"log"
 	"time"
 
 	"github.com/go-redis/redis_rate/v10"
@@ -24,16 +26,15 @@ func NewRedisInteractor(rdb *redis.Client) *RedisInteractor {
 }
 
 func (r *RedisInteractor) VerifyKeyBlock(ctx context.Context, key string) (bool, error) {
-	_, err := r.rdb.Get(ctx, key+":blocked").Result()
-	if err != redis.Nil && err != nil {
+
+	blocked, err := r.rdb.Get(ctx, key+":blocked").Result()
+	if err == redis.Nil {
+		return false, nil
+	} else if err != nil {
 		return false, err
 	}
 
-	if err == redis.Nil {
-		return false, nil
-	}
-
-	return true, nil
+	return blocked == "true", nil
 }
 
 func (r *RedisInteractor) BlockKeyPerTime(ctx context.Context, key string, duration int, t string) error {
@@ -45,6 +46,8 @@ func (r *RedisInteractor) BlockKeyPerTime(ctx context.Context, key string, durat
 		timeToBlock = time.Duration(duration) * time.Second
 	case "hour":
 		timeToBlock = time.Duration(duration) * time.Hour
+	default:
+		return errors.New("invalid time type")
 	}
 
 	err := r.rdb.Set(ctx, key+":blocked", "true", timeToBlock).Err()
@@ -67,6 +70,7 @@ func (r *RedisInteractor) SetLimitForKeyPerTime(ctx context.Context, key string,
 		rateForLimiter = redis_rate.PerHour(rate)
 	}
 
+	log.Println("Setting rate limit for key:", key, rateForLimiter)
 	result, err := r.limiter.Allow(ctx, key, rateForLimiter)
 	if err != nil {
 		return entity.LimitResult{}, err

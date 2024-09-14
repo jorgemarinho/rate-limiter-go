@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jorgemarinho/rate-limiter-go/internal/infra/config"
@@ -22,7 +24,14 @@ func init() {
 }
 
 func main() {
-	envs, err := config.LoadConfig(".")
+
+	// Obter o caminho absoluto do arquivo .env
+	envPath, err := filepath.Abs("../../.env")
+	if err != nil {
+		log.Fatalf("Error getting absolute path: %v", err)
+	}
+
+	envs, err := config.LoadConfig(envPath)
 	if err != nil {
 		panic(err)
 	}
@@ -33,9 +42,11 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.RateLimiter(rateLimiterUseCase, envs))
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "pong"})
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "welcome to rate limiter"})
 	})
+
+	log.Println("Server running on port 8080")
 
 	r.Run(":8080")
 }

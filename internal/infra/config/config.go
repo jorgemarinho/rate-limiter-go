@@ -21,17 +21,17 @@ func LoadConfig(envFile string) (*Config, error) {
 		log.Printf("Warning: %v\n", err)
 	}
 
-	ipMaxRequestsPerSecond, err := strconv.Atoi(getEnv("RATE_LIMIT_IP", "10"))
+	ipMaxRequestsPerSecond, err := strconv.Atoi(getEnv("RATE_LIMIT_IP", "2"))
 	if err != nil {
 		return nil, err
 	}
 
-	tokenMaxRequestsPerSecond, err := strconv.Atoi(getEnv("RATE_LIMIT_TOKEN", "10"))
+	tokenMaxRequestsPerSecond, err := strconv.Atoi(getEnv("RATE_LIMIT_TOKEN", "5"))
 	if err != nil {
 		return nil, err
 	}
 
-	blockDurationSeconds, err := strconv.Atoi(getEnv("BLOCK_LIMIT_TIME_DURATION", "60"))
+	blockDurationSeconds, err := strconv.Atoi(getEnv("BLOCK_LIMIT_TIME_DURATION", "10"))
 	if err != nil {
 		return nil, err
 	}
@@ -39,8 +39,8 @@ func LoadConfig(envFile string) (*Config, error) {
 	cfg := &Config{
 		RateLimitIP:            ipMaxRequestsPerSecond,
 		RateLimitToken:         tokenMaxRequestsPerSecond,
-		TimeLimitType:          "second",
-		TimeBlockType:          "second",
+		TimeLimitType:          getEnv("TIME_LIMIT_TYPE", "second"),
+		TimeBlockType:          getEnv("TIME_BLOCK_TYPE", "second"),
 		BlockLimitTimeDuration: blockDurationSeconds,
 	}
 

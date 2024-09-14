@@ -48,7 +48,10 @@ func (r *RateLimiterUseCase) Execute(ctx context.Context, input InputRateLimiter
 	}
 
 	if resultItem.Allowed == 0 {
-		r.limiter.BlockKeyPerTime(ctx, input.Item, input.BlockLimitTime, input.TimeTypeBlock)
+		err = r.limiter.BlockKeyPerTime(ctx, input.Item, input.BlockLimitTime, input.TimeTypeBlock)
+		if err != nil {
+			return OutputRateLimiter{Err: err}
+		}
 		return OutputRateLimiter{AllowRequest: false}
 	}
 
